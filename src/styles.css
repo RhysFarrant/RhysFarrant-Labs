@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0f0f12;
+  --color-bg-hero: #13131a;
+  --color-surface: #1a1a22;
+  --color-surface-hover: #22222c;
+  --color-panel: #161620;
+  --color-border: #2a2a36;
+  --color-border-subtle: #1f1f2a;
+  --color-text-primary: #f0f0f2;
+  --color-text-secondary: #b4b4be;
+  --color-text-muted: #6e6e7a;
+  --color-accent: #a78bfa;
+  --color-accent-dim: #7c5cfc;
+  --color-accent-soft: rgba(167, 139, 250, 0.08);
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+  --font-display: "Sora", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-text-primary font-sans antialiased;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  a {
+    @apply no-underline transition-colors duration-200;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+    line-height: 1.2;
+  }
+}
+
+.page-gradient {
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 22%,
+    #1d1d2b 0%,
+    #14141f 45%,
+    #0f0f12 100%
+  );
+}
+
+.hero-gradient {
+  background: transparent;
+}
+
+.floating-panel {
+  background: rgba(22, 22, 32, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(42, 42, 54, 0.6);
+}
+
+.panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #4a4a63 #1a1a22;
+}
+
+.panel-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.panel-scroll::-webkit-scrollbar-track {
+  background: #1a1a22;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5f6c9f 0%, #4a4a63 100%);
+  border-radius: 9999px;
+  border: 2px solid #1a1a22;
+}
+
+.panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6f80bd 0%, #5a5a79 100%);
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brand-mark-text {
+  background: linear-gradient(180deg, #cfc3eb 0%, #c1aff7 45%, #a78bfa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 22px rgba(167, 139, 250, 0.24);
+}

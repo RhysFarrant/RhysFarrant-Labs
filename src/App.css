@@ -1,17 +1,2 @@
-.app {
-  min-height: 100vh;
-  display: grid;
-  place-content: center;
-  text-align: center;
-  gap: 0.5rem;
-}
-
-.app h1 {
-  margin: 0;
-  font-size: clamp(2rem, 6vw, 3rem);
-}
-
-.app p {
-  margin: 0;
-  color: #555;
-}
+/* Legacy file intentionally left as a no-op.
+   Active global styling: src/styles.css */

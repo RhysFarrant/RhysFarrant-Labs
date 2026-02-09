@@ -1,13 +1,2 @@
-:root {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #111;
-  background-color: #f7f7f8;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
+/* Legacy file intentionally left as a no-op.
+   Active global styling: src/styles.css */
