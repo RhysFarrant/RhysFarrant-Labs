@@ -16,16 +16,16 @@ export default function Header() {
         </Link>
 
         <div className="inline-flex items-center gap-2">
-          <span className="rounded-full border border-border/70 bg-surface/70 px-3 py-1 text-[11px] uppercase tracking-[0.14em] text-text-muted">
+          <span className="rounded-full border border-accent/50 bg-accent/20 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-text-primary">
             Labs
           </span>
           <a
             href="https://www.rhysfarrant.com"
             target="_blank"
             rel="noreferrer noopener"
-            className="rounded-full border border-accent/40 bg-accent-soft px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-secondary transition-colors hover:border-accent/70 hover:text-text-primary"
+            className="rounded-full border border-border/70 bg-surface/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-text-muted hover:text-text-primary"
           >
-            Main Site
+            Portfolio
           </a>
         </div>
       </div>
