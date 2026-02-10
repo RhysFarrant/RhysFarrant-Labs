@@ -17,6 +17,7 @@ export type LabDef = {
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
+const FormEdgeCasePlaygroundLab = lazy(() => import("@/labs/form-edge-case-playground"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
@@ -50,6 +51,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "State Modelling"],
     lastUpdated: "2026-02-10",
     component: FeatureFlagSimulatorLab,
+  },
+  {
+    slug: "form-edge-case-playground",
+    name: "Form Edge-Case Playground",
+    description: "Stress-test form validation, async submission behavior, and failure recovery UX.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Forms"],
+    lastUpdated: "2026-02-10",
+    component: FormEdgeCasePlaygroundLab,
   },
   {
     slug: "login-test",
