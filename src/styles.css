@@ -14,6 +14,14 @@
   --color-accent: #a78bfa;
   --color-accent-dim: #7c5cfc;
   --color-accent-soft: rgba(167, 139, 250, 0.08);
+  --color-lab-pastel-1: #f6b8c8;
+  --color-lab-pastel-2: #ffd5b8;
+  --color-lab-pastel-3: #f7efb2;
+  --color-lab-pastel-4: #bfeccf;
+  --color-lab-pastel-5: #bcecf4;
+  --color-lab-pastel-6: #c8d8ff;
+  --color-lab-pastel-7: #dccbff;
+  --color-lab-pastel-8: #f6c7e9;
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --font-display: "Sora", "Inter", system-ui, -apple-system, sans-serif;

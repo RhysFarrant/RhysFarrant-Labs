@@ -15,6 +15,7 @@ export type LabDef = {
 };
 
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
+const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 
 export const labs: LabDef[] = [
@@ -26,6 +27,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Tailwind"],
     lastUpdated: "2026-02-09",
     component: CalculatorLab,
+  },
+  {
+    slug: "dice-roller",
+    name: "Dice Roller",
+    description: "Pick any die and simulate random rolls.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Random"],
+    lastUpdated: "2026-02-10",
+    component: DiceRollerLab,
   },
   {
     slug: "login-test",

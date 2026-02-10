@@ -12,6 +12,8 @@ dist
 dist-ssr
 .vercel
 *.local
+.npm-cache*
+.npm-view-cache*
 
 # Editor directories and files
 .vscode/*
