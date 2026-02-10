@@ -1,5 +1,3 @@
-import { NavLink } from "react-router-dom";
-
 export default function PanelHeader() {
   return (
     <div className="flex items-center justify-between border-b border-border px-6 py-4 sm:px-8">
@@ -15,20 +13,8 @@ export default function PanelHeader() {
       </div>
 
       <nav className="inline-flex items-center gap-2">
-        <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `rounded-md px-3 py-1.5 text-sm transition-colors ${
-              isActive
-                ? "bg-surface text-text-primary"
-                : "text-text-muted hover:text-text-primary"
-            }`
-          }
-        >
-          Home
-        </NavLink>
         <a
-          href="https://github.com/rhysfarrant"
+          href="https://github.com/RhysFarrant/RhysFarrant-Labs"
           target="_blank"
           rel="noreferrer noopener"
           className="rounded-md border border-border px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-text-muted hover:text-text-primary"
