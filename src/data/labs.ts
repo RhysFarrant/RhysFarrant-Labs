@@ -20,6 +20,7 @@ const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const ErrorStateGalleryLab = lazy(() => import("@/labs/error-state-gallery"));
 const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
 const FormEdgeCasePlaygroundLab = lazy(() => import("@/labs/form-edge-case-playground"));
+const KeyboardNavigationTesterLab = lazy(() => import("@/labs/keyboard-navigation-tester"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
@@ -80,6 +81,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Forms"],
     lastUpdated: "2026-02-10",
     component: FormEdgeCasePlaygroundLab,
+  },
+  {
+    slug: "keyboard-navigation-tester",
+    name: "Keyboard Navigation Tester",
+    description: "Test focus order, keyboard-only flows, and modal trapping behavior.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Accessibility"],
+    lastUpdated: "2026-02-10",
+    component: KeyboardNavigationTesterLab,
   },
   {
     slug: "login-test",
