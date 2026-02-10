@@ -12,6 +12,42 @@ const pastelColors = [
   "var(--color-lab-pastel-8)",
 ];
 const SPIN_DURATION_MS = 3800;
+const MAX_TICKS_PER_FRAME = 3;
+
+function cubicBezierAt(time: number, p1: number, p2: number) {
+  const inverse = 1 - time;
+  return 3 * inverse * inverse * time * p1 + 3 * inverse * time * time * p2 + time * time * time;
+}
+
+function cubicBezierDerivativeAt(time: number, p1: number, p2: number) {
+  const inverse = 1 - time;
+  return 3 * inverse * inverse * p1 + 6 * inverse * time * (p2 - p1) + 3 * time * time * (1 - p2);
+}
+
+function cubicBezierSolveForTime(progress: number, p1: number, p2: number) {
+  let time = progress;
+
+  for (let i = 0; i < 5; i += 1) {
+    const value = cubicBezierAt(time, p1, p2) - progress;
+    if (Math.abs(value) < 1e-5) break;
+
+    const derivative = cubicBezierDerivativeAt(time, p1, p2);
+    if (Math.abs(derivative) < 1e-6) break;
+
+    time -= value / derivative;
+    time = Math.max(0, Math.min(1, time));
+  }
+
+  return time;
+}
+
+function spinEasing(progress: number) {
+  if (progress <= 0) return 0;
+  if (progress >= 1) return 1;
+
+  const time = cubicBezierSolveForTime(progress, 0.16, 0.3);
+  return cubicBezierAt(time, 1, 1);
+}
 
 type SpinResult = {
   id: number;
@@ -19,26 +55,37 @@ type SpinResult = {
   color: string;
 };
 
+type PendingResult = SpinResult & {
+  sourceLineIndex: number;
+};
+
 export default function WheelSpinnerLab() {
   const [entryText, setEntryText] = useState("");
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<SpinResult | null>(null);
+  const [pendingResult, setPendingResult] = useState<PendingResult | null>(null);
   const [history, setHistory] = useState<SpinResult[]>([]);
-  const spinTimerRef = useRef<number | null>(null);
+  const spinAnimationFrameRef = useRef<number | null>(null);
+  const rotationRef = useRef(0);
+  const lastTickBoundaryRef = useRef(0);
+  const lastTickAtRef = useRef(0);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const resultIdRef = useRef(0);
 
-  const entries = useMemo(
+  const parsedEntries = useMemo(
     () =>
       entryText
         .split("\n")
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0),
+        .map((line, index) => ({ label: line.trim(), sourceLineIndex: index }))
+        .filter((line) => line.label.length > 0),
     [entryText]
   );
 
-  const segmentCount = entries.length;
+  const entries = parsedEntries.map((line) => line.label);
+  const segmentCount = parsedEntries.length;
   const canSpin = segmentCount >= 1;
+  const isResultDialogOpen = pendingResult !== null;
   const segmentAngle = segmentCount > 0 ? 360 / segmentCount : 360;
   const labelRadius = segmentCount <= 6 ? 84 : segmentCount <= 10 ? 90 : 96;
   const labelArcWidth = segmentCount > 0 ? (2 * Math.PI * labelRadius) / segmentCount : 0;
@@ -47,11 +94,72 @@ export default function WheelSpinnerLab() {
 
   useEffect(() => {
     return () => {
-      if (spinTimerRef.current !== null) {
-        window.clearTimeout(spinTimerRef.current);
+      if (spinAnimationFrameRef.current !== null) {
+        window.cancelAnimationFrame(spinAnimationFrameRef.current);
+      }
+      if (audioContextRef.current !== null) {
+        void audioContextRef.current.close();
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!isResultDialogOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPendingResult(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isResultDialogOpen]);
+
+  function ensureAudioContext() {
+    if (audioContextRef.current !== null) return audioContextRef.current;
+
+    try {
+      const AudioContextConstructor =
+        window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextConstructor) return null;
+      audioContextRef.current = new AudioContextConstructor();
+      return audioContextRef.current;
+    } catch {
+      return null;
+    }
+  }
+
+  function playTick() {
+    const nowMs = performance.now();
+    if (nowMs - lastTickAtRef.current < 14) return;
+
+    const audioContext = ensureAudioContext();
+    if (audioContext === null) return;
+
+    if (audioContext.state !== "running") {
+      return;
+    }
+
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.type = "square";
+    oscillator.frequency.setValueAtTime(1300, now);
+    oscillator.frequency.exponentialRampToValueAtTime(850, now + 0.03);
+
+    gainNode.gain.setValueAtTime(0.0001, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.05, now + 0.003);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.045);
+
+    lastTickAtRef.current = nowMs;
+  }
 
   const wheelGradient = useMemo(() => {
     if (segmentCount === 0) {
@@ -69,21 +177,81 @@ export default function WheelSpinnerLab() {
   }, [entries, segmentAngle, segmentCount]);
 
   function handleSpin() {
-    if (isSpinning || !canSpin) return;
+    if (isSpinning || !canSpin || isResultDialogOpen) return;
 
-    const targetIndex = Math.floor(Math.random() * segmentCount);
-    const currentRotationNormalized = ((rotation % 360) + 360) % 360;
-    const targetRotationNormalized = (360 - targetIndex * segmentAngle) % 360;
+    const audioContext = ensureAudioContext();
+    if (audioContext !== null && audioContext.state !== "running") {
+      void audioContext.resume();
+    }
+
+    const startRotation = rotationRef.current;
+    const currentRotationNormalized = ((startRotation % 360) + 360) % 360;
+    const boundaryEpsilon = Math.max(0.25, Math.min(2, segmentAngle * 0.03));
+    let pointerAngle = Math.random() * 360;
+
+    if (segmentCount > 1) {
+      const offsetWithinSegment = pointerAngle % segmentAngle;
+      if (offsetWithinSegment < boundaryEpsilon) {
+        pointerAngle += boundaryEpsilon - offsetWithinSegment;
+      } else if (segmentAngle - offsetWithinSegment < boundaryEpsilon) {
+        pointerAngle -= boundaryEpsilon - (segmentAngle - offsetWithinSegment);
+      }
+      pointerAngle = ((pointerAngle % 360) + 360) % 360;
+    }
+
+    const targetIndex = segmentCount === 1 ? 0 : Math.floor(pointerAngle / segmentAngle);
+    const targetRotationNormalized = (360 - pointerAngle) % 360;
     const extraTurns = (4 + Math.floor(Math.random() * 3)) * 360;
     const deltaRotation =
       ((targetRotationNormalized - currentRotationNormalized + 360) % 360) + extraTurns;
 
     setIsSpinning(true);
     setWinner(null);
-    setRotation((prev) => prev + deltaRotation);
+    lastTickBoundaryRef.current = Math.floor(startRotation / segmentAngle);
+    const startTime = performance.now();
 
-    spinTimerRef.current = window.setTimeout(() => {
-      const label = entries[targetIndex];
+    if (spinAnimationFrameRef.current !== null) {
+      window.cancelAnimationFrame(spinAnimationFrameRef.current);
+    }
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / SPIN_DURATION_MS);
+      const eased = spinEasing(progress);
+      const nextRotation = startRotation + deltaRotation * eased;
+
+      rotationRef.current = nextRotation;
+      setRotation(nextRotation);
+
+      const currentBoundary = Math.floor(nextRotation / segmentAngle);
+      const boundariesCrossed = Math.max(0, currentBoundary - lastTickBoundaryRef.current);
+      const tickCount = Math.min(MAX_TICKS_PER_FRAME, boundariesCrossed);
+
+      for (let i = 0; i < tickCount; i += 1) {
+        playTick();
+      }
+
+      if (boundariesCrossed > 0) {
+        lastTickBoundaryRef.current = currentBoundary;
+      }
+
+      if (progress < 1) {
+        spinAnimationFrameRef.current = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      const finalRotation = startRotation + deltaRotation;
+      rotationRef.current = finalRotation;
+      setRotation(finalRotation);
+
+      const winningEntry = parsedEntries[targetIndex];
+      if (!winningEntry) {
+        setIsSpinning(false);
+        spinAnimationFrameRef.current = null;
+        return;
+      }
+
+      const label = winningEntry.label;
       const color = pastelColors[targetIndex % pastelColors.length];
       const result = {
         id: ++resultIdRef.current,
@@ -93,9 +261,28 @@ export default function WheelSpinnerLab() {
 
       setIsSpinning(false);
       setWinner(result);
+      setPendingResult({ ...result, sourceLineIndex: winningEntry.sourceLineIndex });
       setHistory((prev) => [result, ...prev].slice(0, 8));
-      spinTimerRef.current = null;
-    }, SPIN_DURATION_MS);
+      spinAnimationFrameRef.current = null;
+    };
+
+    spinAnimationFrameRef.current = window.requestAnimationFrame(animate);
+  }
+
+  function handleRemovePendingResult() {
+    if (pendingResult === null) return;
+
+    setEntryText((currentText) => {
+      const lines = currentText.split("\n");
+      if (pendingResult.sourceLineIndex < 0 || pendingResult.sourceLineIndex >= lines.length) {
+        return currentText;
+      }
+
+      lines.splice(pendingResult.sourceLineIndex, 1);
+      return lines.join("\n");
+    });
+
+    setPendingResult(null);
   }
 
   return (
@@ -114,7 +301,7 @@ export default function WheelSpinnerLab() {
           <textarea
             value={entryText}
             onChange={(event) => setEntryText(event.target.value)}
-            disabled={isSpinning}
+            disabled={isSpinning || isResultDialogOpen}
             className="h-full min-h-[14rem] w-full resize-y rounded-lg border border-border bg-surface/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60 disabled:cursor-not-allowed disabled:opacity-60"
             placeholder={"One entry per line\nExample:\nPizza\nChicken\nNoodles"}
             aria-label="Wheel entries"
@@ -135,9 +322,6 @@ export default function WheelSpinnerLab() {
               style={{
                 backgroundImage: wheelGradient,
                 transform: `rotate(${rotation}deg)`,
-                transition: isSpinning
-                  ? `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.16, 1, 0.3, 1)`
-                  : "none",
               }}
             >
               <div className="absolute inset-0">
@@ -191,7 +375,7 @@ export default function WheelSpinnerLab() {
             <button
               type="button"
               onClick={handleSpin}
-              disabled={isSpinning || !canSpin}
+              disabled={isSpinning || !canSpin || isResultDialogOpen}
               className="absolute left-1/2 top-1/2 z-20 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border/70 bg-panel text-xs font-semibold text-text-primary shadow-lg shadow-black/30 transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-45"
             >
               {isSpinning ? "..." : "Spin"}
@@ -200,7 +384,11 @@ export default function WheelSpinnerLab() {
         </div>
 
         <div className="flex justify-end lg:col-start-2 lg:row-start-2 lg:items-end">
-          <Button variant="ghost" onClick={() => setHistory([])} disabled={history.length === 0 || isSpinning}>
+          <Button
+            variant="ghost"
+            onClick={() => setHistory([])}
+            disabled={history.length === 0 || isSpinning || isResultDialogOpen}
+          >
             Clear History
           </Button>
         </div>
@@ -241,6 +429,35 @@ export default function WheelSpinnerLab() {
           </ul>
         )}
       </div>
+
+      {pendingResult !== null ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-bg/70 px-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wheel-result-title"
+          onClick={() => setPendingResult(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-xl border border-border bg-panel p-4 shadow-2xl shadow-black/40"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Spin Result</p>
+            <p id="wheel-result-title" className="mt-2 text-2xl font-semibold" style={{ color: pendingResult.color }}>
+              {pendingResult.label}
+            </p>
+            <p className="mt-2 text-sm text-text-secondary">
+              Remove this result from the wheel before the next spin?
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setPendingResult(null)}>
+                Keep
+              </Button>
+              <Button onClick={handleRemovePendingResult}>Remove</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
