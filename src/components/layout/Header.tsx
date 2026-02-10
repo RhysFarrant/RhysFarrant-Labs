@@ -121,7 +121,7 @@ export default function Header() {
                     LinkedIn
                   </a>
                   <a
-                    href="mailto:your@email.com"
+                    href="mailto:FarrantRhys@gmail.com"
                     role="menuitem"
                     onClick={() => setMobileContactOpen(false)}
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-text-muted transition-colors hover:bg-surface hover:text-text-primary"
@@ -221,7 +221,7 @@ export default function Header() {
               LinkedIn
             </a>
             <a
-              href="mailto:your@email.com"
+              href="mailto:FarrantRhys@gmail.com"
               className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-text-muted hover:text-text-primary"
             >
               <svg

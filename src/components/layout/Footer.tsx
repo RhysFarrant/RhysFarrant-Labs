@@ -37,7 +37,7 @@ export default function Footer() {
           &middot;
         </span>
         <a
-          href="mailto:your@email.com"
+          href="mailto:FarrantRhys@gmail.com"
           className="inline-flex items-center gap-1.5 text-sm transition-colors hover:text-text-primary"
         >
           <svg
