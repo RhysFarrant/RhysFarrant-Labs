@@ -19,6 +19,7 @@ const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
+const TimersLab = lazy(() => import("@/labs/timers"));
 const WheelSpinnerLab = lazy(() => import("@/labs/wheel-spinner"));
 
 export const labs: LabDef[] = [
@@ -66,6 +67,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Theming"],
     lastUpdated: "2026-01-03",
     component: ThemeTestingLab,
+  },
+  {
+    slug: "timers",
+    name: "Timers",
+    description: "Count up timer, custom countdown, and Pomodoro work/break cycles.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Timers"],
+    lastUpdated: "2026-02-10",
+    component: TimersLab,
   },
   {
     slug: "wheel-spinner",
