@@ -45,9 +45,9 @@ export const labs: LabDef[] = [
     slug: "login-test",
     name: "Login Test",
     description: "Client-side auth form prototype for validation and UX flows.",
-    status: "WIP",
+    status: "Stable",
     stack: ["React 18", "TypeScript", "Forms"],
-    lastUpdated: "2026-02-09",
+    lastUpdated: "2026-02-10",
     component: LoginTestLab,
   },
   {
