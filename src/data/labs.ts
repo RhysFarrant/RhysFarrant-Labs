@@ -15,6 +15,7 @@ export type LabDef = {
 };
 
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
+const ConfigDrivenUiRendererLab = lazy(() => import("@/labs/config-driven-ui-renderer"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const ErrorStateGalleryLab = lazy(() => import("@/labs/error-state-gallery"));
 const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
@@ -34,6 +35,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Tailwind"],
     lastUpdated: "2026-02-09",
     component: CalculatorLab,
+  },
+  {
+    slug: "config-driven-ui-renderer",
+    name: "Config-Driven UI Renderer",
+    description: "Render reusable UI from JSON schema instead of hardcoded JSX.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Schema Rendering"],
+    lastUpdated: "2026-02-10",
+    component: ConfigDrivenUiRendererLab,
   },
   {
     slug: "dice-roller",
