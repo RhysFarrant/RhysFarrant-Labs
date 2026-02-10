@@ -1,6 +1,7 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 
 export type LabStatus = "WIP" | "Stable" | "Archived";
+export type LabType = "Learning" | "Play";
 
 type LabComponent = ComponentType | LazyExoticComponent<ComponentType>;
 
@@ -9,6 +10,7 @@ export type LabDef = {
   name: string;
   description: string;
   status: LabStatus;
+  type: LabType;
   stack: string[];
   lastUpdated: string;
   component: LabComponent;
@@ -33,6 +35,7 @@ export const labs: LabDef[] = [
     name: "Calculator",
     description: "Quick arithmetic sandbox for tiny interaction checks.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Tailwind"],
     lastUpdated: "2026-02-09",
     component: CalculatorLab,
@@ -42,6 +45,7 @@ export const labs: LabDef[] = [
     name: "Config-Driven UI Renderer",
     description: "Render reusable UI from JSON schema instead of hardcoded JSX.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Schema Rendering"],
     lastUpdated: "2026-02-10",
     component: ConfigDrivenUiRendererLab,
@@ -51,6 +55,7 @@ export const labs: LabDef[] = [
     name: "Dice Roller",
     description: "Pick any die and simulate random rolls.",
     status: "Stable",
+    type: "Play",
     stack: ["React 18", "TypeScript", "Random"],
     lastUpdated: "2026-02-10",
     component: DiceRollerLab,
@@ -60,6 +65,7 @@ export const labs: LabDef[] = [
     name: "Error State Gallery",
     description: "Visual catalogue of reusable error patterns for common failure scenarios.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "UX Patterns"],
     lastUpdated: "2026-02-10",
     component: ErrorStateGalleryLab,
@@ -69,6 +75,7 @@ export const labs: LabDef[] = [
     name: "Feature Flag Simulator",
     description: "Environment and segment based flag sandbox with real-time UI behavior preview.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "State Modelling"],
     lastUpdated: "2026-02-10",
     component: FeatureFlagSimulatorLab,
@@ -78,6 +85,7 @@ export const labs: LabDef[] = [
     name: "Form Edge-Case Playground",
     description: "Stress-test form validation, async submission behavior, and failure recovery UX.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Forms"],
     lastUpdated: "2026-02-10",
     component: FormEdgeCasePlaygroundLab,
@@ -87,6 +95,7 @@ export const labs: LabDef[] = [
     name: "Keyboard Navigation Tester",
     description: "Test focus order, keyboard-only flows, and modal trapping behavior.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Accessibility"],
     lastUpdated: "2026-02-10",
     component: KeyboardNavigationTesterLab,
@@ -96,6 +105,7 @@ export const labs: LabDef[] = [
     name: "Login Test",
     description: "Client-side auth form prototype for validation and UX flows.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Forms"],
     lastUpdated: "2026-02-10",
     component: LoginTestLab,
@@ -105,6 +115,7 @@ export const labs: LabDef[] = [
     name: "Micro-Animation Playground",
     description: "Small interaction tests for hover, press, and success/failure feedback.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Animation"],
     lastUpdated: "2026-01-28",
     component: MicroAnimationPlaygroundLab,
@@ -114,6 +125,7 @@ export const labs: LabDef[] = [
     name: "Theme Testing",
     description: "Light and dark palette sandbox with a live mock site preview.",
     status: "Stable",
+    type: "Learning",
     stack: ["React 18", "TypeScript", "Theming"],
     lastUpdated: "2026-01-03",
     component: ThemeTestingLab,
@@ -123,6 +135,7 @@ export const labs: LabDef[] = [
     name: "Timers",
     description: "Count up timer, custom countdown, and Pomodoro work/break cycles.",
     status: "Stable",
+    type: "Play",
     stack: ["React 18", "TypeScript", "Timers"],
     lastUpdated: "2026-02-10",
     component: TimersLab,
@@ -132,6 +145,7 @@ export const labs: LabDef[] = [
     name: "Wheel Spinner",
     description: "Animated prize-wheel style random selector.",
     status: "Stable",
+    type: "Play",
     stack: ["React 18", "TypeScript", "Animation"],
     lastUpdated: "2026-02-10",
     component: WheelSpinnerLab,
