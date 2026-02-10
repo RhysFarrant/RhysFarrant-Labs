@@ -18,6 +18,7 @@ const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
+const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
 const WheelSpinnerLab = lazy(() => import("@/labs/wheel-spinner"));
 
 export const labs: LabDef[] = [
@@ -56,6 +57,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Animation"],
     lastUpdated: "2025-12-28",
     component: MicroAnimationPlaygroundLab,
+  },
+  {
+    slug: "theme-testing",
+    name: "Theme Testing",
+    description: "Light and dark palette sandbox with a live mock site preview.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Theming"],
+    lastUpdated: "2026-01-03",
+    component: ThemeTestingLab,
   },
   {
     slug: "wheel-spinner",
