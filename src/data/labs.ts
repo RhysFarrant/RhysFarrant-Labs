@@ -16,6 +16,7 @@ export type LabDef = {
 
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
+const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
@@ -40,6 +41,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Random"],
     lastUpdated: "2026-02-10",
     component: DiceRollerLab,
+  },
+  {
+    slug: "feature-flag-simulator",
+    name: "Feature Flag Simulator",
+    description: "Environment and segment based flag sandbox with real-time UI behavior preview.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "State Modelling"],
+    lastUpdated: "2026-02-10",
+    component: FeatureFlagSimulatorLab,
   },
   {
     slug: "login-test",
