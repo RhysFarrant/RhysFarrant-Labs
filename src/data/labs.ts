@@ -16,6 +16,7 @@ export type LabDef = {
 
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
+const ErrorStateGalleryLab = lazy(() => import("@/labs/error-state-gallery"));
 const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
 const FormEdgeCasePlaygroundLab = lazy(() => import("@/labs/form-edge-case-playground"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
@@ -42,6 +43,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Random"],
     lastUpdated: "2026-02-10",
     component: DiceRollerLab,
+  },
+  {
+    slug: "error-state-gallery",
+    name: "Error State Gallery",
+    description: "Visual catalogue of reusable error patterns for common failure scenarios.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "UX Patterns"],
+    lastUpdated: "2026-02-10",
+    component: ErrorStateGalleryLab,
   },
   {
     slug: "feature-flag-simulator",
