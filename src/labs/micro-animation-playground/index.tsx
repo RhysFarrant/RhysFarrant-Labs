@@ -109,6 +109,7 @@ export default function MicroAnimationPlaygroundLab() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [savedPopupValue, setSavedPopupValue] = useState("");
   const [draftPopupValue, setDraftPopupValue] = useState("");
+  const [isFlipCardBack, setIsFlipCardBack] = useState(false);
   const [reorderItems, setReorderItems] = useState(reorderItemsSeed);
   const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
@@ -124,6 +125,7 @@ export default function MicroAnimationPlaygroundLab() {
   const cardResetTimerRef = useRef<number | null>(null);
   const exportResolveTimerRef = useRef<number | null>(null);
   const exportResetTimerRef = useRef<number | null>(null);
+  const flipAudioContextRef = useRef<AudioContext | null>(null);
   const searchPanelRef = useRef<HTMLDivElement | null>(null);
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const tabButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -147,6 +149,9 @@ export default function MicroAnimationPlaygroundLab() {
       }
       if (exportResetTimerRef.current !== null) {
         window.clearTimeout(exportResetTimerRef.current);
+      }
+      if (flipAudioContextRef.current !== null) {
+        void flipAudioContextRef.current.close();
       }
     };
   }, []);
@@ -196,6 +201,77 @@ export default function MicroAnimationPlaygroundLab() {
       setTogglePulse(false);
       togglePulseTimerRef.current = null;
     }, 140);
+  }
+
+  function ensureFlipAudioContext() {
+    if (flipAudioContextRef.current !== null) return flipAudioContextRef.current;
+
+    try {
+      const AudioContextConstructor =
+        window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextConstructor) return null;
+      flipAudioContextRef.current = new AudioContextConstructor();
+      return flipAudioContextRef.current;
+    } catch {
+      return null;
+    }
+  }
+
+  function playFlipWhoosh() {
+    const audioContext = ensureFlipAudioContext();
+    if (!audioContext) return;
+
+    try {
+      if (audioContext.state === "suspended") {
+        void audioContext.resume();
+      }
+
+      const now = audioContext.currentTime;
+      const bufferSize = Math.floor(audioContext.sampleRate * 0.15);
+      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i += 1) {
+        const t = i / bufferSize;
+        const envelope = Math.sin(t * Math.PI) * Math.pow(1 - t, 0.5);
+        noiseData[i] = (Math.random() * 2 - 1) * envelope;
+      }
+
+      const noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = noiseBuffer;
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(800, now);
+      filter.frequency.exponentialRampToValueAtTime(2500, now + 0.07);
+      filter.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+      filter.Q.value = 1.5;
+
+      const gainNode = audioContext.createGain();
+      gainNode.gain.setValueAtTime(0.15, now);
+      gainNode.gain.linearRampToValueAtTime(0.2, now + 0.05);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+
+      noiseSource.connect(filter);
+      filter.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      noiseSource.start();
+      noiseSource.stop(now + 0.2);
+    } catch {
+      // Swallow audio errors to keep UI interactions unaffected.
+    }
+  }
+
+  function handleFlipCard() {
+    setIsFlipCardBack((prev) => !prev);
+    playFlipWhoosh();
+  }
+
+  function handleResetFlipCard() {
+    if (!isFlipCardBack) return;
+    setIsFlipCardBack(false);
+    playFlipWhoosh();
   }
 
   function runCardSave(nextTone?: FeedbackTone) {
@@ -661,140 +737,198 @@ export default function MicroAnimationPlaygroundLab() {
       </section>
       </div>
 
-      <section className="rounded-xl border border-border bg-bg/30 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold">Drag Reorder</h3>
-            <p className="mt-1 text-sm text-text-muted">
-              Drag cards to reorder the list, between rows, or directly onto another row.
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setReorderItems(reorderItemsSeed);
-              setDraggingItemId(null);
-              setDropTargetIndex(null);
-              setDropTargetItemId(null);
-            }}
+      <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
+        <section className="rounded-xl border border-border bg-bg/30 p-4">
+          <h3 className="text-base font-semibold">Card Flip</h3>
+          <p className="mt-1 text-sm text-text-muted">
+            Click to flip front/back and test 3D transform easing.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleFlipCard}
+            className="mt-4 block w-full text-left"
+            style={{ perspective: "1200px" }}
           >
-            Reset Order
-          </Button>
-        </div>
-
-        <ul className="mt-4 space-y-0">
-          {reorderItems.map((item, index) => {
-            const isDragging = draggingItemId === item.id;
-            const isDropTargetBetween = dropTargetIndex === index && draggingItemId !== null;
-            const isDropTargetOnItem =
-              dropTargetItemId === item.id && draggingItemId !== null && !isDragging;
-
-            return (
-              <li key={item.id}>
-                <div
-                  onDragEnter={() => {
-                    setDropTargetIndex(index);
-                    setDropTargetItemId(null);
-                  }}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    setDropTargetIndex(index);
-                    setDropTargetItemId(null);
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    if (!draggingItemId) return;
-                    moveReorderItemToIndex(draggingItemId, index);
-                    setDraggingItemId(null);
-                    setDropTargetIndex(null);
-                    setDropTargetItemId(null);
-                  }}
-                  className={`h-4 rounded transition-all ${
-                    draggingItemId === null
-                      ? "bg-transparent"
-                      : isDropTargetBetween
-                        ? "bg-emerald-400/70"
-                        : "bg-border/45"
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  draggable
-                  onDragStart={() => {
-                    setDraggingItemId(item.id);
-                    setDropTargetIndex(index);
-                    setDropTargetItemId(null);
-                  }}
-                  onDragEnter={() => {
-                    if (draggingItemId === item.id) return;
-                    setDropTargetIndex(null);
-                    setDropTargetItemId(item.id);
-                  }}
-                  onDragOver={(event) => {
-                    event.preventDefault();
-                    if (draggingItemId === item.id) return;
-                    setDropTargetIndex(null);
-                    setDropTargetItemId(item.id);
-                  }}
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    if (!draggingItemId || draggingItemId === item.id) return;
-                    moveReorderItemToIndex(draggingItemId, index);
-                    setDraggingItemId(null);
-                    setDropTargetIndex(null);
-                    setDropTargetItemId(null);
-                  }}
-                  onDragEnd={() => {
-                    setDraggingItemId(null);
-                    setDropTargetIndex(null);
-                    setDropTargetItemId(null);
-                  }}
-                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition-all ${
-                    isDragging
-                      ? "border-accent/65 bg-accent/15 opacity-70"
-                      : isDropTargetOnItem
-                        ? "border-emerald-400/65 bg-emerald-500/10"
-                        : "border-border/80 bg-surface/40 hover:border-accent/45 hover:bg-surface/60"
-                  }`}
-                >
-                  <span className="text-sm text-text-primary">{item.label}</span>
-                  <span className="text-xs text-text-muted">{index + 1}</span>
-                </button>
-              </li>
-            );
-          })}
-
-          <li>
-            <div
-              onDragEnter={() => {
-                setDropTargetIndex(reorderItems.length);
-                setDropTargetItemId(null);
+            <span
+              className="relative block h-44 w-full rounded-xl transition-transform duration-500 ease-out"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: isFlipCardBack ? "rotateY(180deg)" : "rotateY(0deg)",
               }}
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDropTargetIndex(reorderItems.length);
-                setDropTargetItemId(null);
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                if (!draggingItemId) return;
-                moveReorderItemToIndex(draggingItemId, reorderItems.length);
+            >
+              <span
+                className="absolute inset-0 rounded-xl border border-border/80 bg-surface/45 p-4"
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Front Face</p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">Design Review</p>
+                <p className="mt-1 text-xs text-text-muted">
+                  Hover and click to verify depth, shadow, and rotation timing.
+                </p>
+              </span>
+              <span
+                className="absolute inset-0 rounded-xl border border-accent/50 bg-accent/10 p-4"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Back Face</p>
+                <p className="mt-2 text-sm font-semibold text-text-primary">Animation Notes</p>
+                <p className="mt-1 text-xs text-text-muted">
+                  Good flip feels quick at start, slower near settle with clear face contrast.
+                </p>
+              </span>
+            </span>
+          </button>
+
+          <div className="mt-3 flex gap-2">
+            <Button className="flex-1" onClick={handleFlipCard}>
+              Flip Card
+            </Button>
+            <Button variant="ghost" onClick={handleResetFlipCard}>
+              Reset
+            </Button>
+          </div>
+
+          <p className="mt-3 text-xs text-text-muted">
+            Side: <span className="text-text-primary">{isFlipCardBack ? "Back" : "Front"}</span>
+          </p>
+        </section>
+
+        <section className="rounded-xl border border-border bg-bg/30 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-base font-semibold">Drag Reorder</h3>
+              <p className="mt-1 text-sm text-text-muted">
+                Drag cards to reorder the list, between rows, or directly onto another row.
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setReorderItems(reorderItemsSeed);
                 setDraggingItemId(null);
                 setDropTargetIndex(null);
                 setDropTargetItemId(null);
               }}
-              className={`h-2 rounded transition-all ${
-                draggingItemId === null
-                  ? "bg-transparent"
-                  : dropTargetIndex === reorderItems.length
-                    ? "bg-emerald-400/70"
-                    : "bg-border/45"
-              }`}
-            />
-          </li>
-        </ul>
-      </section>
+            >
+              Reset Order
+            </Button>
+          </div>
+
+          <ul className="mt-4 space-y-0">
+            {reorderItems.map((item, index) => {
+              const isDragging = draggingItemId === item.id;
+              const isDropTargetBetween = dropTargetIndex === index && draggingItemId !== null;
+              const isDropTargetOnItem =
+                dropTargetItemId === item.id && draggingItemId !== null && !isDragging;
+
+              return (
+                <li key={item.id}>
+                  <div
+                    onDragEnter={() => {
+                      setDropTargetIndex(index);
+                      setDropTargetItemId(null);
+                    }}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      setDropTargetIndex(index);
+                      setDropTargetItemId(null);
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      if (!draggingItemId) return;
+                      moveReorderItemToIndex(draggingItemId, index);
+                      setDraggingItemId(null);
+                      setDropTargetIndex(null);
+                      setDropTargetItemId(null);
+                    }}
+                    className={`h-4 rounded transition-all ${
+                      draggingItemId === null
+                        ? "bg-transparent"
+                        : isDropTargetBetween
+                          ? "bg-emerald-400/70"
+                          : "bg-border/45"
+                    }`}
+                  />
+
+                  <button
+                    type="button"
+                    draggable
+                    onDragStart={() => {
+                      setDraggingItemId(item.id);
+                      setDropTargetIndex(index);
+                      setDropTargetItemId(null);
+                    }}
+                    onDragEnter={() => {
+                      if (draggingItemId === item.id) return;
+                      setDropTargetIndex(null);
+                      setDropTargetItemId(item.id);
+                    }}
+                    onDragOver={(event) => {
+                      event.preventDefault();
+                      if (draggingItemId === item.id) return;
+                      setDropTargetIndex(null);
+                      setDropTargetItemId(item.id);
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      if (!draggingItemId || draggingItemId === item.id) return;
+                      moveReorderItemToIndex(draggingItemId, index);
+                      setDraggingItemId(null);
+                      setDropTargetIndex(null);
+                      setDropTargetItemId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggingItemId(null);
+                      setDropTargetIndex(null);
+                      setDropTargetItemId(null);
+                    }}
+                    className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition-all ${
+                      isDragging
+                        ? "border-accent/65 bg-accent/15 opacity-70"
+                        : isDropTargetOnItem
+                          ? "border-emerald-400/65 bg-emerald-500/10"
+                          : "border-border/80 bg-surface/40 hover:border-accent/45 hover:bg-surface/60"
+                    }`}
+                  >
+                    <span className="text-sm text-text-primary">{item.label}</span>
+                    <span className="text-xs text-text-muted">{index + 1}</span>
+                  </button>
+                </li>
+              );
+            })}
+
+            <li>
+              <div
+                onDragEnter={() => {
+                  setDropTargetIndex(reorderItems.length);
+                  setDropTargetItemId(null);
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDropTargetIndex(reorderItems.length);
+                  setDropTargetItemId(null);
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (!draggingItemId) return;
+                  moveReorderItemToIndex(draggingItemId, reorderItems.length);
+                  setDraggingItemId(null);
+                  setDropTargetIndex(null);
+                  setDropTargetItemId(null);
+                }}
+                className={`h-2 rounded transition-all ${
+                  draggingItemId === null
+                    ? "bg-transparent"
+                    : dropTargetIndex === reorderItems.length
+                      ? "bg-emerald-400/70"
+                      : "bg-border/45"
+                }`}
+              />
+            </li>
+          </ul>
+        </section>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-xl border border-border bg-bg/30 p-4">

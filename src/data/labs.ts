@@ -55,7 +55,7 @@ export const labs: LabDef[] = [
     description: "Small interaction tests for hover, press, and success/failure feedback.",
     status: "Stable",
     stack: ["React 18", "TypeScript", "Animation"],
-    lastUpdated: "2025-12-28",
+    lastUpdated: "2026-01-28",
     component: MicroAnimationPlaygroundLab,
   },
   {
