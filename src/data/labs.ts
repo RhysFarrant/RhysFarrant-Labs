@@ -17,6 +17,7 @@ export type LabDef = {
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
+const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const WheelSpinnerLab = lazy(() => import("@/labs/wheel-spinner"));
 
 export const labs: LabDef[] = [
@@ -46,6 +47,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Forms"],
     lastUpdated: "2026-02-09",
     component: LoginTestLab,
+  },
+  {
+    slug: "micro-animation-playground",
+    name: "Micro-Animation Playground",
+    description: "Small interaction tests for hover, press, and success/failure feedback.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Animation"],
+    lastUpdated: "2025-12-28",
+    component: MicroAnimationPlaygroundLab,
   },
   {
     slug: "wheel-spinner",

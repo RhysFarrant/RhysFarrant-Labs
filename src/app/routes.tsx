@@ -4,6 +4,7 @@ import { labs } from "@/data/labs";
 import LabPage from "@/pages/LabPage";
 import LabsIndex from "@/pages/LabsIndex";
 import NotFound from "@/pages/NotFound";
+import RouteError from "@/pages/RouteError";
 
 const labRoutes: RouteObject[] = labs.map((lab) => ({
   path: lab.slug,
@@ -14,6 +15,7 @@ export const routes: RouteObject[] = [
   {
     path: "/",
     element: <App />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <LabsIndex /> },
       ...labRoutes,
