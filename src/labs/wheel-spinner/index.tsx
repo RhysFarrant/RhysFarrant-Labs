@@ -105,8 +105,8 @@ export default function WheelSpinnerLab() {
         Add entries (one per line), then spin the wheel.
       </p>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
-        <div className="rounded-lg border border-border bg-bg/25 px-4 py-3">
+      <div className="grid gap-4 lg:grid-cols-[1fr_360px] lg:grid-rows-[auto_auto] lg:items-stretch">
+        <div className="grid h-full grid-rows-[auto_minmax(14rem,1fr)_auto] rounded-lg border border-border bg-bg/25 px-4 py-3 lg:row-span-2">
           <div className="mb-2 flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Entries</p>
             <p className="text-xs text-text-muted">{segmentCount} active</p>
@@ -115,7 +115,7 @@ export default function WheelSpinnerLab() {
             value={entryText}
             onChange={(event) => setEntryText(event.target.value)}
             disabled={isSpinning}
-            className="h-56 w-full resize-y rounded-lg border border-border bg-surface/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-full min-h-[14rem] w-full resize-y rounded-lg border border-border bg-surface/80 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60 disabled:cursor-not-allowed disabled:opacity-60"
             placeholder={"One entry per line\nExample:\nPizza\nChicken\nNoodles"}
             aria-label="Wheel entries"
           />
@@ -124,7 +124,7 @@ export default function WheelSpinnerLab() {
           </p>
         </div>
 
-        <div className="mx-auto w-full max-w-[340px]">
+        <div className="mx-auto w-full max-w-[340px] lg:col-start-2 lg:row-start-1">
           <div className="relative mx-auto h-72 w-72">
             <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-2">
               <div className="h-0 w-0 border-l-[10px] border-r-[10px] border-t-[18px] border-l-transparent border-r-transparent border-t-text-primary" />
@@ -198,12 +198,12 @@ export default function WheelSpinnerLab() {
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="flex justify-end">
-        <Button variant="ghost" onClick={() => setHistory([])} disabled={history.length === 0 || isSpinning}>
-          Clear History
-        </Button>
+        <div className="flex justify-end lg:col-start-2 lg:row-start-2 lg:items-end">
+          <Button variant="ghost" onClick={() => setHistory([])} disabled={history.length === 0 || isSpinning}>
+            Clear History
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border bg-bg/40 px-4 py-3">
