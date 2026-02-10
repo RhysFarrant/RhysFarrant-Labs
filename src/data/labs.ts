@@ -17,6 +17,7 @@ export type LabDef = {
 const CalculatorLab = lazy(() => import("@/labs/calculator"));
 const DiceRollerLab = lazy(() => import("@/labs/dice-roller"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
+const WheelSpinnerLab = lazy(() => import("@/labs/wheel-spinner"));
 
 export const labs: LabDef[] = [
   {
@@ -45,6 +46,15 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Forms"],
     lastUpdated: "2026-02-09",
     component: LoginTestLab,
+  },
+  {
+    slug: "wheel-spinner",
+    name: "Wheel Spinner",
+    description: "Animated prize-wheel style random selector.",
+    status: "Stable",
+    stack: ["React 18", "TypeScript", "Animation"],
+    lastUpdated: "2026-02-10",
+    component: WheelSpinnerLab,
   },
 ];
 
