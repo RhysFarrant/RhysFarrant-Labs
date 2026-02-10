@@ -140,7 +140,7 @@ export default function FormEdgeCasePlaygroundLab() {
       detail,
     };
 
-    setAttemptLog((current) => [item, ...current].slice(0, 7));
+    setAttemptLog((current) => [item, ...current].slice(0, 20));
   }
 
   function markAllTouched() {
@@ -282,11 +282,11 @@ export default function FormEdgeCasePlaygroundLab() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[340px_1fr]">
-        <section className="space-y-4 rounded-xl border border-border bg-bg/35 p-4">
+        <section className="space-y-3 rounded-xl border border-border bg-bg/35 p-3">
           <div>
             <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Simulation Controls</p>
-            <div className="mt-3 space-y-2">
-              <label className="block text-xs text-text-muted">
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              <label className="block rounded-md border border-border/70 bg-surface/45 px-2.5 py-2 text-[11px] text-text-muted">
                 Validation Delay
                 <select
                   value={String(config.validationDelayMs)}
@@ -296,7 +296,7 @@ export default function FormEdgeCasePlaygroundLab() {
                       validationDelayMs: Number(event.target.value),
                     }))
                   }
-                  className="mt-1 w-full rounded-lg border border-border bg-surface/75 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60"
+                  className="mt-1 w-full rounded-md border border-border bg-surface/75 px-2 py-1.5 text-xs text-text-primary outline-none transition-colors focus:border-accent/60"
                 >
                   {delayOptions.map((delay) => (
                     <option key={delay} value={delay}>
@@ -306,7 +306,7 @@ export default function FormEdgeCasePlaygroundLab() {
                 </select>
               </label>
 
-              <label className="block text-xs text-text-muted">
+              <label className="block rounded-md border border-border/70 bg-surface/45 px-2.5 py-2 text-[11px] text-text-muted">
                 Submission Delay
                 <select
                   value={String(config.submissionDelayMs)}
@@ -316,7 +316,7 @@ export default function FormEdgeCasePlaygroundLab() {
                       submissionDelayMs: Number(event.target.value),
                     }))
                   }
-                  className="mt-1 w-full rounded-lg border border-border bg-surface/75 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60"
+                  className="mt-1 w-full rounded-md border border-border bg-surface/75 px-2 py-1.5 text-xs text-text-primary outline-none transition-colors focus:border-accent/60"
                 >
                   {delayOptions.map((delay) => (
                     <option key={delay} value={delay}>
@@ -326,7 +326,7 @@ export default function FormEdgeCasePlaygroundLab() {
                 </select>
               </label>
 
-              <label className="flex items-center gap-2 rounded-lg border border-border/70 bg-surface/45 px-3 py-2 text-sm text-text-secondary">
+              <label className="flex items-center gap-2 rounded-md border border-border/70 bg-surface/45 px-2.5 py-2 text-xs text-text-secondary sm:col-span-2">
                 <input
                   type="checkbox"
                   checked={config.forceEmailConflict}
@@ -341,7 +341,7 @@ export default function FormEdgeCasePlaygroundLab() {
                 Force async email conflict
               </label>
 
-              <label className="block text-xs text-text-muted">
+              <label className="block rounded-md border border-border/70 bg-surface/45 px-2.5 py-2 text-[11px] text-text-muted sm:col-span-2">
                 Submission Result
                 <select
                   value={config.submitMode}
@@ -351,7 +351,7 @@ export default function FormEdgeCasePlaygroundLab() {
                       submitMode: event.target.value as SubmitMode,
                     }))
                   }
-                  className="mt-1 w-full rounded-lg border border-border bg-surface/75 px-3 py-2 text-sm text-text-primary outline-none transition-colors focus:border-accent/60"
+                  className="mt-1 w-full rounded-md border border-border bg-surface/75 px-2 py-1.5 text-xs text-text-primary outline-none transition-colors focus:border-accent/60"
                 >
                   <option value="success">Success</option>
                   <option value="partial">Partial Success</option>
@@ -382,21 +382,20 @@ export default function FormEdgeCasePlaygroundLab() {
                 Clear Notice
               </Button>
             </div>
-            <p className="mt-2 text-[11px] text-text-muted">
-              Use restore after partial/failure paths to retry with adjusted controls.
-            </p>
           </div>
 
           <div className="rounded-lg border border-border/70 bg-surface/45 p-3">
             <p className="text-xs uppercase tracking-[0.12em] text-text-muted">Attempt Log</p>
-            <ul className="mt-2 space-y-1 text-xs text-text-secondary">
-              {attemptLog.length === 0 ? <li>No events yet.</li> : null}
-              {attemptLog.map((item) => (
-                <li key={item.id}>
-                  [{item.timestamp}] {item.outcome}: {item.detail}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-2 h-28 overflow-y-auto pr-1">
+              <ul className="space-y-1 text-xs text-text-secondary">
+                {attemptLog.length === 0 ? <li>No events yet.</li> : null}
+                {attemptLog.map((item) => (
+                  <li key={item.id}>
+                    [{item.timestamp}] {item.outcome}: {item.detail}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
