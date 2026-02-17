@@ -25,6 +25,7 @@ const FormEdgeCasePlaygroundLab = lazy(() => import("@/labs/form-edge-case-playg
 const KeyboardNavigationTesterLab = lazy(() => import("@/labs/keyboard-navigation-tester"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
+const OrganicDesignLab = lazy(() => import("@/labs/organic-design-lab"));
 const ThemeTestingLab = lazy(() => import("@/labs/theme-testing"));
 const TimersLab = lazy(() => import("@/labs/timers"));
 const WheelSpinnerLab = lazy(() => import("@/labs/wheel-spinner"));
@@ -119,6 +120,16 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Animation"],
     lastUpdated: "2026-01-28",
     component: MicroAnimationPlaygroundLab,
+  },
+  {
+    slug: "organic-design-lab",
+    name: "Organic Design Elements Lab",
+    description: "Experiment with textured non-flat backgrounds and reusable leaf motifs.",
+    status: "Stable",
+    type: "Play",
+    stack: ["React 18", "TypeScript", "Visual Design"],
+    lastUpdated: "2026-02-17",
+    component: OrganicDesignLab,
   },
   {
     slug: "theme-testing",
