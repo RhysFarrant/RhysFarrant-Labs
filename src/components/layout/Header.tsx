@@ -185,6 +185,14 @@ export default function Header() {
                     Labs
                   </span>
                   <a
+                    href="https://templates.rhysfarrant.com/"
+                    role="menuitem"
+                    onClick={() => setMobileSiteOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] text-text-muted transition-colors hover:bg-surface hover:text-text-primary"
+                  >
+                    Templates
+                  </a>
+                  <a
                     href="https://www.rhysfarrant.com"
                     role="menuitem"
                     onClick={() => setMobileSiteOpen(false)}
@@ -246,6 +254,12 @@ export default function Header() {
               Labs
             </span>
             <a
+              href="https://templates.rhysfarrant.com/"
+              className="rounded-full border border-border/70 bg-surface/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-text-muted hover:text-text-primary"
+            >
+              Templates
+            </a>
+            <a
               href="https://www.rhysfarrant.com"
               className="rounded-full border border-border/70 bg-surface/70 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-text-muted hover:text-text-primary"
             >
@@ -257,3 +271,4 @@ export default function Header() {
     </header>
   );
 }
+
