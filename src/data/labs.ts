@@ -23,6 +23,7 @@ const ErrorStateGalleryLab = lazy(() => import("@/labs/error-state-gallery"));
 const FeatureFlagSimulatorLab = lazy(() => import("@/labs/feature-flag-simulator"));
 const FormEdgeCasePlaygroundLab = lazy(() => import("@/labs/form-edge-case-playground"));
 const KeyboardNavigationTesterLab = lazy(() => import("@/labs/keyboard-navigation-tester"));
+const LanguageSwitchingTestLab = lazy(() => import("@/labs/language-switching-test"));
 const LoginTestLab = lazy(() => import("@/labs/login-test"));
 const MicroAnimationPlaygroundLab = lazy(() => import("@/labs/micro-animation-playground"));
 const OrganicDesignLab = lazy(() => import("@/labs/organic-design-lab"));
@@ -100,6 +101,16 @@ export const labs: LabDef[] = [
     stack: ["React 18", "TypeScript", "Accessibility"],
     lastUpdated: "2026-02-10",
     component: KeyboardNavigationTesterLab,
+  },
+  {
+    slug: "language-switching-test",
+    name: "Language Switching Test",
+    description: "Switch locales from a dropdown and validate live translated copy in a sample app.",
+    status: "Stable",
+    type: "Learning",
+    stack: ["React 18", "TypeScript", "i18n"],
+    lastUpdated: "2026-02-21",
+    component: LanguageSwitchingTestLab,
   },
   {
     slug: "login-test",
